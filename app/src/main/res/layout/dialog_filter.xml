@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:weightSum="1"
+        android:background="#f4f5f6">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="FILTRO"
+            android:textColor="#09398d"
+            android:textSize="17dp"
+            android:layout_weight="1.00"
+            android:gravity="center"
+            android:layout_margin="7dp"
+            android:id="@+id/txtTituloAlert" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="300dp"
+        android:layout_height="240dp"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:weightSum="1"
+        android:background="#FFFFFF">
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="OK"
+                android:textColor="#ffffff"
+                android:id="@+id/btncloseDialog"
+                android:background="@drawable/button_rounded"
+                android:layout_gravity="center_horizontal"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/btncloseDialog">
+
+                <CheckBox
+                    android:layout_width="215dp"
+                    android:layout_height="wrap_content"
+                    android:text="Mais perto"
+                    android:id="@+id/checkPerto"
+                    android:layout_gravity="center_horizontal"
+                    android:checked="true"
+                    android:layout_marginTop="15dp" />
+
+                <CheckBox
+                    android:layout_width="215dp"
+                    android:layout_height="wrap_content"
+                    android:text="Apenas ativos         "
+                    android:id="@+id/checkAtivos"
+                    android:layout_gravity="center_horizontal"
+                    android:checked="false"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp" />
+
+                <CheckBox
+                    android:layout_width="215dp"
+                    android:layout_height="wrap_content"
+                    android:text="Apenas vencidos    "
+                    android:id="@+id/checkVencidos"
+                    android:layout_gravity="center_horizontal"
+                    android:checked="false"
+                    android:layout_marginBottom="10dp" />
+
+                <CheckBox
+                    android:layout_width="215dp"
+                    android:layout_height="wrap_content"
+                    android:text="Ordenar pela hora de entrada (Mais antigo)"
+                    android:id="@+id/checkBox"
+                    android:layout_gravity="center_horizontal"
+                    android:checked="false" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>
