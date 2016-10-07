@@ -1,5 +1,7 @@
 package br.com.tads.estarfiscal;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -13,9 +15,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -26,12 +30,20 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+
+import br.com.tads.estarfiscal.adapter.EnderecoAdapter;
 import br.com.tads.estarfiscal.model.Estar;
+import br.com.tads.estarfiscal.retrofit.ApiManager;
+import br.com.tads.estarfiscal.retrofit.CustomCallback;
+import okhttp3.ResponseBody;
 
 public class DescriptionActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -45,7 +57,7 @@ public class DescriptionActivity extends AppCompatActivity implements OnMapReady
     private TextView txtEntrada;
     private TextView txtEndereco;
     private LinearLayout linearbuttons;
-
+    LinearLayout parent;
     private GoogleMap mMap;
     public static final int  REQUEST_PERMISSIONS_CODE = 128;
     private GoogleApiClient mGoogleApiClient;
@@ -56,6 +68,9 @@ public class DescriptionActivity extends AppCompatActivity implements OnMapReady
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_description);
+
+
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
@@ -81,15 +96,22 @@ public class DescriptionActivity extends AppCompatActivity implements OnMapReady
         textView3 = (TextView) findViewById(R.id.textView3);
         txtEndereco = (TextView) findViewById(R.id.txtEndereco);
         linearbuttons = (LinearLayout) findViewById(R.id.linearbuttons);
+        parent = (LinearLayout) findViewById(R.id.parent);
+        Button btnMultar = (Button) findViewById(R.id.btnMultar);
+        Button btnRetirar = (Button) findViewById(R.id.btnRetirar);
+
 
         txtPlaca.setText(estar.getPlaca());
         txtEndereco.setText(estar.getAddress());
         txtHora.setText(estar.getHoras());
         txtEntrada.setText(estar.getInicio());
 
-
-
-
+        btnRetirar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                retirardata();
+            }
+        });
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -170,5 +192,67 @@ public class DescriptionActivity extends AppCompatActivity implements OnMapReady
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    ApiManager apiManager;
+    public void retirardata(){
+
+        final Gson gson = new Gson();
+
+
+        apiManager.retirar(new CustomCallback<ResponseBody>(this, parent, new CustomCallback.OnResponse<ResponseBody>() {
+            @Override
+            public void onResponse(ResponseBody response) {
+                try {
+
+                    JSONObject jsonObject = new JSONObject(response.string());
+                    if(jsonObject.get("result").toString().equalsIgnoreCase("1")) {
+
+                        new AlertDialog.Builder(DescriptionActivity.this)
+                                .setTitle("Sucesso")
+                                .setMessage("Veículo foi removido com sucesso!")
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        startActivity(new Intent(getBaseContext(),MainActivity.class));
+                                        finish();
+                                    }})
+                                .show();
+
+                        Log.e("response", "response");
+                    }else {
+                        new AlertDialog.Builder(DescriptionActivity.this)
+                                .setTitle("ERRO!")
+                                .setMessage("Erro ao realizar operação! Deseja realizar novamente?")
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        retirardata();
+                                    }})
+                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }).show();
+                    }
+                }catch (Exception e){
+                    Log.e("Exception", e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.e("Exception", t.getMessage());
+            }
+
+            @Override
+            public void onRetry(Throwable t) {
+                retirardata();
+            }
+        }), estar);
+
     }
 }

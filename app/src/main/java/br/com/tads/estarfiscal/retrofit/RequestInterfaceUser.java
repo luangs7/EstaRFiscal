@@ -19,6 +19,9 @@ public interface RequestInterfaceUser {
     @FormUrlEncoded
     Call<ResponseBody> getEstar(@Query("filter") String filter, @Field("latitude") Double latitude, @Field("longitude") Double longitude);
 
+    @GET("setters/retirarEstar.php")
+    Call<ResponseBody> retirar(@Query("id") String id);
+
     @GET("teste/server")
     Call<ResponseBody> testeServer();
 

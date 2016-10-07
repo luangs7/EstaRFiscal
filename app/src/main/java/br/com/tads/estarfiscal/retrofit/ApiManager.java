@@ -59,6 +59,12 @@ public class ApiManager {
         call.enqueue(callback);
     }
 
+    public void retirar(Callback<ResponseBody> callback,Estar estar){
+        RequestInterfaceUser request = retrofit.create(RequestInterfaceUser.class);
+        Call<ResponseBody> call = request.retirar(estar.getIdEstar());
+        call.enqueue(callback);
+    }
+
 
     public void testeServer(Callback<ResponseBody> callback){
         RequestInterfaceUser request = retrofit.create(RequestInterfaceUser.class);
