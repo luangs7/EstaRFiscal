@@ -72,7 +72,7 @@ public  class CustomCallback<T> implements Callback<T> {
             //Cria o gerador do AlertDialog
             AlertDialog.Builder builder = new AlertDialog.Builder(context,R.style.AppTheme_AlertDialog);
             //define o titulo
-            builder.setTitle("Problema de conexao");
+                builder.setTitle("Problema de conexao");
             //define a mensagem
             builder.setMessage("Gostaria de tentar novamente");
             //define um botão como positivo

@@ -2,7 +2,9 @@
         import com.google.gson.annotations.Expose;
         import com.google.gson.annotations.SerializedName;
 
-public class Estar {
+        import java.io.Serializable;
+
+        public class Estar implements Serializable{
 
     @SerializedName("idEstar")
     @Expose

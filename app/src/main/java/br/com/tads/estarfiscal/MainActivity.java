@@ -3,6 +3,7 @@ package br.com.tads.estarfiscal;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -22,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -98,6 +100,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 callConnection();
 
         }
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Estar estar = (Estar) parent.getItemAtPosition(position);
+                Intent it = new Intent(getBaseContext(),DescriptionActivity.class);
+                it.putExtra("estar",estar);
+                startActivity(it);
+            }
+        });
 
 
     }
