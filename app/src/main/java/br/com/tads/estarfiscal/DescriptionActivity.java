@@ -113,11 +113,19 @@ public class DescriptionActivity extends AppCompatActivity implements OnMapReady
             }
         });
 
+        btnMultar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                notificardata();
+            }
+        });
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        apiManager = new ApiManager(this);
     }
 
     private synchronized void callConnection(){
@@ -240,6 +248,79 @@ public class DescriptionActivity extends AppCompatActivity implements OnMapReady
                     }
                 }catch (Exception e){
                     Log.e("Exception", e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.e("Exception", t.getMessage());
+            }
+
+            @Override
+            public void onRetry(Throwable t) {
+                retirardata();
+            }
+        }), estar);
+
+    }
+
+    public void notificardata(){
+
+        final Gson gson = new Gson();
+
+
+        apiManager.notificar(new CustomCallback<ResponseBody>(this, parent, new CustomCallback.OnResponse<ResponseBody>() {
+            @Override
+            public void onResponse(ResponseBody response) {
+                try {
+
+                    JSONObject jsonObject = new JSONObject(response.string());
+                    if(jsonObject.get("result").toString().equalsIgnoreCase("1")) {
+
+                        new AlertDialog.Builder(DescriptionActivity.this)
+                                .setTitle("Sucesso")
+                                .setMessage("O motorista foi notificado!")
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        startActivity(new Intent(getBaseContext(),MainActivity.class));
+                                        finish();
+                                    }})
+                                .show();
+
+                        Log.e("response", "response");
+                    }else {
+                        new AlertDialog.Builder(DescriptionActivity.this)
+                                .setTitle("ERRO!")
+                                .setMessage("Erro ao realizar operação! Deseja realizar novamente?")
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        retirardata();
+                                    }})
+                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }).show();
+                    }
+                }catch (Exception e){
+                    Log.e("Exception", e.getMessage());
+                    new AlertDialog.Builder(DescriptionActivity.this)
+                            .setTitle("Sucesso")
+                            .setMessage("O motorista foi notificado!")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    dialog.dismiss();
+                                }})
+                            .show();
+
+                    Log.e("response", "response");
                 }
             }
 
