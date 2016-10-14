@@ -1,6 +1,7 @@
 package br.com.tads.estarfiscal;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -45,6 +46,8 @@ import org.json.JSONObject;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import br.com.tads.estarfiscal.adapter.EnderecoAdapter;
 import br.com.tads.estarfiscal.model.Estar;
@@ -67,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     String error = "";
     public static final int  REQUEST_PERMISSIONS_CODE = 128;
     String filter = "0";
+    Timer timer = new Timer();
+    boolean stateactivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +115,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 startActivity(it);
             }
         });
+
+        stateactivity = true;
+
 
 
     }
@@ -204,7 +212,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         if(lastLocation != null) {
             LatLng location = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-            getdata();
+
+            timer.scheduleAtFixedRate(new TimerTask() {
+
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            boolean finish = MainActivity.this.isFinishing();
+                            if(!finish && stateactivity)
+                            {
+                            getdata();
+                            }
+                        }
+                    });
+                }
+            }, 0, 30000);
+
         }else{
             Toast.makeText(getBaseContext(), "Sua localização não foi encontrada. Verifique se seu celular está funcionando corretamente.", Toast.LENGTH_SHORT).show();
             finish();
@@ -319,4 +344,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
     }
 
+
+    @Override
+    protected void onStop() {
+        stateactivity = false;
+        super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        stateactivity = true;
+        super.onResume();
+    }
 }
