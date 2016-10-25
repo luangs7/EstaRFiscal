@@ -71,6 +71,12 @@ public class ApiManager {
         call.enqueue(callback);
     }
 
+    public void getplaca(Callback<ResponseBody> callback,String placa){
+        RequestInterfaceUser request = retrofit.create(RequestInterfaceUser.class);
+        Call<ResponseBody> call = request.getPlaca(placa);
+        call.enqueue(callback);
+    }
+
 
     public void testeServer(Callback<ResponseBody> callback){
         RequestInterfaceUser request = retrofit.create(RequestInterfaceUser.class);

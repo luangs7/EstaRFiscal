@@ -9,5 +9,13 @@
         android:icon="@drawable/oil_filter"
         />
 
+    <item
+        android:id="@+id/scanner"
+        android:title="Scanner"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:icon="@drawable/phone_camera"
+        />
+
 
 </menu>

@@ -1,14 +1,13 @@
 package br.com.tads.estarfiscal;
 
 import android.Manifest;
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,6 +26,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -72,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     String filter = "0";
     Timer timer = new Timer();
     boolean stateactivity;
+    private static final int RC_OCR_CAPTURE = 9003;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -257,6 +260,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             return true;
         }
 
+        if (id == R.id.scanner) {
+            Intent intent = new Intent(this, OcrCaptureActivity.class);
+            intent.putExtra(OcrCaptureActivity.AutoFocus, true);
+            intent.putExtra(OcrCaptureActivity.UseFlash, false);
+
+            startActivityForResult(intent, RC_OCR_CAPTURE);
+            return true;
+        }
+
         return false;
     }
 
@@ -344,6 +356,49 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == RC_OCR_CAPTURE) {
+            if (resultCode == CommonStatusCodes.SUCCESS) {
+                if (data != null) {
+                    String text = data.getStringExtra(OcrCaptureActivity.TextBlockObject);
+
+                    final Dialog dialog = new Dialog(MainActivity.this);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.dialog_placa);
+
+                    LinearLayout relativeLayout1 = (LinearLayout) dialog.findViewById(R.id.relativeLayout1);
+                    final EditText editText = (EditText) dialog.findViewById(R.id.editText);
+                    Button btncloseDialog = (Button) dialog.findViewById(R.id.btncloseDialog);
+                    TextView txtTituloAlert = (TextView) dialog.findViewById(R.id.txtTituloAlert);
+
+                    editText.setText(text);
+
+                    btncloseDialog.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if(editText.getText().length() > 0) {
+                                setdata(editText.getText().toString());
+                                dialog.dismiss();
+                            }else{
+                                Toast.makeText(MainActivity.this, "Insira uma placa!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+
+                    dialog.show();
+
+                } else {
+                    Toast.makeText(MainActivity.this, "Erro ao scannear, tente novamente.", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(MainActivity.this, "Erro ao scannear, tente novamente.", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
 
     @Override
     protected void onStop() {
@@ -356,4 +411,54 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         stateactivity = true;
         super.onResume();
     }
+
+
+    public void setdata(final String placa){
+
+        final Gson gson = new Gson();
+
+
+        apiManager.getplaca(new CustomCallback<ResponseBody>(this, relativemain, new CustomCallback.OnResponse<ResponseBody>() {
+            @Override
+            public void onResponse(ResponseBody response) {
+                try {
+
+                    JSONObject jsonObject = new JSONObject(response.string());
+                    if(jsonObject.get("result").toString().equalsIgnoreCase("1")) {
+
+                        final JSONArray jsonArray = jsonObject.getJSONArray("content");
+                        Type type = new TypeToken<ArrayList<Estar>>() {
+                        }.getType();
+                        listdata = gson.fromJson(jsonArray.toString(), type);
+
+
+                        adapter = new EnderecoAdapter(getBaseContext(),listdata);
+                        listView.setAdapter(adapter);
+                        if(listdata.size() == 0){
+                            Toast.makeText(MainActivity.this, "Não há dados correspondentes ao seu filtro.", Toast.LENGTH_SHORT).show();
+                            dialogFilter();
+                        }
+                        Log.e("response", "response");
+                    }else {
+
+                    }
+
+                }catch (Exception e){
+                    Log.e("response", "response");
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.e("Exception", t.getMessage());
+            }
+
+            @Override
+            public void onRetry(Throwable t) {
+                setdata(placa);
+            }
+        }), placa);
+
+    }
+
 }

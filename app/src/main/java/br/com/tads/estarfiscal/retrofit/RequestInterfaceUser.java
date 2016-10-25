@@ -25,6 +25,10 @@ public interface RequestInterfaceUser {
     @GET("setters/push.php")
     Call<ResponseBody> notificar(@Query("UserId") String id);
 
+    @POST("getters/getEstarByPlaca.php")
+    @FormUrlEncoded
+    Call<ResponseBody> getPlaca(@Field("Placa") String placa);
+
     @GET("teste/server")
     Call<ResponseBody> testeServer();
 
