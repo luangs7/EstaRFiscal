@@ -99,6 +99,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onRefresh() {
                 getdata();
+
+                timer.cancel();
+
+                Timer timer = new Timer();
+                timer.scheduleAtFixedRate(new TimerTask() {
+
+                    @Override
+                    public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                boolean finish = MainActivity.this.isFinishing();
+                                if(!finish && stateactivity)
+                                {
+                                    getdata();
+                                }
+                            }
+                        });
+                    }
+                }, 0, 30000);
+
             }
         });
 
@@ -388,8 +409,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                     dialog.show();
 
+                    //timer.cancel();
+
                 } else {
-                    Toast.makeText(MainActivity.this, "Erro ao scannear, tente novamente.", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(MainActivity.this, "Erro ao scannear, tente novamente.", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 Toast.makeText(MainActivity.this, "Erro ao scannear, tente novamente.", Toast.LENGTH_SHORT).show();

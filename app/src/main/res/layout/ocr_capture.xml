@@ -8,6 +8,14 @@
     android:keepScreenOn="true"
     android:orientation="vertical">
 
+    <android.support.v7.widget.Toolbar
+        android:elevation="4dp"
+        android:id="@+id/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:minHeight="?attr/actionBarSize"
+        android:background="@color/colorPrimary"/>
+
     <br.com.tads.estarfiscal.camera.CameraSourcePreview
         android:id="@+id/preview"
         android:layout_width="match_parent"
